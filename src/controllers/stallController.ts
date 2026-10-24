@@ -1,3 +1,4 @@
+import { getUser } from '../middlewares/auth.ts';
 import type { Request, Response } from 'express';
 import { StallService } from '../services/stallService.ts';
 import { getValidated } from '../middlewares/validate.ts';
@@ -42,21 +43,20 @@ export class StallController {
     res.status(200).json({ status: 'success', data: menus });
   };
 
-  createStall = async (_req: Request, res: Response): Promise<void> => {
+  createStall = async (req: Request, res: Response): Promise<void> => {
     const body = getValidated<CreateStallInput>(res, 'body');
-
-    // SEMENTARA: pemilik warung di-hardcode dulu karena login belum ada.
-    // Nanti diganti dengan id user dari token.
-    const ownerId = 2;
+    const { id: ownerId } = getUser(req); // pemilik = user dari token, bukan dari body
 
     const stall = await this.stallService.createStall(body, ownerId);
     res.status(201).json({ status: 'success', data: stall });
   };
 
-  updateStall = async (_req: Request, res: Response): Promise<void> => {
+  updateStall = async (req: Request, res: Response): Promise<void> => {
     const { id } = getValidated<IdParam>(res, 'params');
     const body = getValidated<UpdateStallInput>(res, 'body');
-    const stall = await this.stallService.updateStall(id, body);
+    const user = getUser(req);
+
+    const stall = await this.stallService.updateStall(id, body, user);
     res.status(200).json({ status: 'success', data: stall });
   };
 

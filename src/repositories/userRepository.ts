@@ -1,3 +1,4 @@
+import { eq } from 'drizzle-orm';
 import { getDb } from '../db/index.ts';
 import { users } from '../db/schema.ts';
 
@@ -18,6 +19,12 @@ export class UserRepository {
       role: users.role,
       createdAt: users.createdAt,
     }).from(users);
+  }
+
+  async findByEmail(email: string) {
+    const db = await getDb();
+    const rows = await db.select().from(users).where(eq(users.email, email));
+    return rows[0];
   }
 
   async create(input: CreateUserInput) {

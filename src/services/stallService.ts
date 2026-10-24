@@ -7,6 +7,8 @@ import type { MenuItemDto, StallResponseDto } from '../dtos/stallDto.ts';
 import { AppError } from '../errors/AppError.ts';
 import { NotFoundError } from '../errors/NotFoundError.ts';
 import type { CreateStallInput, UpdateStallInput } from '../schemas/stallSchema.ts';
+import { ForbiddenError } from '../errors/ForbiddenError.ts';
+import type { AuthUser } from './tokenService.ts';
 
 type StallRow = NonNullable<Awaited<ReturnType<StallRepository['findById']>>>;
 
@@ -62,7 +64,20 @@ export class StallService {
     return this.toDto(row);
   }
 
-  async updateStall(id: number, input: UpdateStallInput): Promise<StallResponseDto> {
+  async updateStall(
+    id: number,
+    input: UpdateStallInput,
+    user: AuthUser,
+  ): Promise<StallResponseDto> {
+    // Owner hanya boleh mengubah warung miliknya. Admin boleh semua.
+    if (user.role !== 'admin') {
+      const current = await this.stallRepository.findById(id);
+      if (!current) throw new NotFoundError('Warung tidak ditemukan');
+      if (current.ownerId !== user.id) {
+        throw new ForbiddenError('Kamu hanya bisa mengubah warung milikmu sendiri');
+      }
+    }
+
     const row = await this.stallRepository.update(id, input);
     if (!row) throw new NotFoundError('Warung tidak ditemukan');
     return this.toDto(row);

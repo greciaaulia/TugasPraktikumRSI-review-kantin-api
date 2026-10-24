@@ -7,6 +7,7 @@ import { apiRouter } from './routes/apiRouter.ts';
 import { stallRouter } from './routes/stallRouter.ts';
 import { notFoundHandler } from './middlewares/notFound.ts';
 import { errorHandler } from './middlewares/errorHandler.ts';
+import { authRouter } from './routes/authRouter.ts';
 
 const app: Application = express();
 const PORT: number = 3000;
@@ -31,6 +32,7 @@ app.get('/health', async (req: Request, res: Response) => {
 });
 
 app.use('/api/v1/stalls', stallRouter);
+app.use('/api/v1/auth', authRouter);
 app.use('/api/v1', apiRouter);
 
 // Harus paling akhir: 404 untuk alamat yang tidak ada, lalu penangkap semua error.
