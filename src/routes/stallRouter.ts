@@ -9,9 +9,12 @@ import {
   stallQuerySchema,
   updateStallSchema,
 } from '../schemas/stallSchema.ts';
+import { ReviewController } from '../controllers/reviewController.ts';
+import { createReviewSchema } from '../schemas/reviewSchema.ts';
 
 const stallRouter = Router();
 const stallController = new StallController();
+const reviewController = new ReviewController();
 
 // Publik: boleh dibaca siapa saja.
 stallRouter.get('/', validate(stallQuerySchema, 'query'), stallController.getStalls);
@@ -40,6 +43,15 @@ stallRouter.delete(
   authorize('admin'),
   validate(idParamSchema, 'params'),
   stallController.deleteStall,
+);
+
+// Harus login, role apa pun boleh.
+stallRouter.post(
+  '/:id/reviews',
+  authenticate,
+  validate(idParamSchema, 'params'),
+  validate(createReviewSchema, 'body'),
+  reviewController.createReview,
 );
 
 export { stallRouter };
