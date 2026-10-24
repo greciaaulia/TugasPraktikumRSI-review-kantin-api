@@ -1,21 +1,23 @@
 import express, { type Request, type Response, type Application } from 'express';
 import { sql } from 'drizzle-orm';
 import swaggerUi from 'swagger-ui-express';
-import swaggerDocument from './docs/swagger-output.json' with { type: 'json' };
+import { openApiDocument } from './docs/openapi.ts';
 import { getDb } from './db/index.ts';
 import { apiRouter } from './routes/apiRouter.ts';
 import { stallRouter } from './routes/stallRouter.ts';
+import { authRouter } from './routes/authRouter.ts';
+import { authenticate } from './middlewares/auth.ts';
+import { authorize } from './middlewares/authorize.ts';
 import { notFoundHandler } from './middlewares/notFound.ts';
 import { errorHandler } from './middlewares/errorHandler.ts';
-import { authRouter } from './routes/authRouter.ts';
 
 const app: Application = express();
 const PORT: number = 3000;
 
 app.use(express.json());
 
-// Dokumentasi API (Swagger UI) dari spec hasil generate swagger-autogen.
-app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+// Dokumentasi API, dibuat otomatis dari schema zod.
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(openApiDocument));
 
 app.get('/health', async (req: Request, res: Response) => {
   try {
@@ -33,9 +35,11 @@ app.get('/health', async (req: Request, res: Response) => {
 
 app.use('/api/v1/stalls', stallRouter);
 app.use('/api/v1/auth', authRouter);
-app.use('/api/v1', apiRouter);
 
-// Harus paling akhir: 404 untuk alamat yang tidak ada, lalu penangkap semua error.
+// Endpoint lama (users, reviews, likes, flags, audit): hanya admin.
+app.use('/api/v1', authenticate, authorize('admin'), apiRouter);
+
+// Harus paling akhir.
 app.use(notFoundHandler);
 app.use(errorHandler);
 
