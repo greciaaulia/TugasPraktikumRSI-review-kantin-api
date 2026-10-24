@@ -5,6 +5,8 @@ import swaggerDocument from './docs/swagger-output.json' with { type: 'json' };
 import { getDb } from './db/index.ts';
 import { apiRouter } from './routes/apiRouter.ts';
 import { stallRouter } from './routes/stallRouter.ts';
+import { notFoundHandler } from './middlewares/notFound.ts';
+import { errorHandler } from './middlewares/errorHandler.ts';
 
 const app: Application = express();
 const PORT: number = 3000;
@@ -30,6 +32,10 @@ app.get('/health', async (req: Request, res: Response) => {
 
 app.use('/api/v1/stalls', stallRouter);
 app.use('/api/v1', apiRouter);
+
+// Harus paling akhir: 404 untuk alamat yang tidak ada, lalu penangkap semua error.
+app.use(notFoundHandler);
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`Server berjalan di http://localhost:${PORT}`);

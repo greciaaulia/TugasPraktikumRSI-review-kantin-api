@@ -32,49 +32,17 @@
     "/api/v1/stalls/": {
       "get": {
         "description": "",
-        "parameters": [
-          {
-            "name": "search",
-            "in": "query",
-            "type": "string"
-          },
-          {
-            "name": "category",
-            "in": "query",
-            "type": "string"
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "type": "integer"
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "type": "integer"
-          }
-        ],
         "responses": {
-          "200": {
-            "description": "Daftar warung"
+          "default": {
+            "description": ""
           }
         }
       },
       "post": {
         "description": "",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/StallInput"
-            }
-          }
-        ],
         "responses": {
-          "201": {
-            "description": "Warung dibuat"
+          "default": {
+            "description": ""
           }
         }
       }
@@ -87,15 +55,12 @@
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "integer"
+            "type": "string"
           }
         ],
         "responses": {
-          "200": {
-            "description": "Detail warung"
-          },
-          "404": {
-            "description": "Tidak ditemukan"
+          "default": {
+            "description": ""
           }
         }
       },
@@ -106,23 +71,12 @@
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "integer"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/StallInput"
-            }
+            "type": "string"
           }
         ],
         "responses": {
-          "200": {
-            "description": "Warung ter-update"
-          },
-          "404": {
-            "description": "Tidak ditemukan"
+          "default": {
+            "description": ""
           }
         }
       },
@@ -133,15 +87,12 @@
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "integer"
+            "type": "string"
           }
         ],
         "responses": {
-          "200": {
-            "description": "Warung terhapus"
-          },
-          "404": {
-            "description": "Tidak ditemukan"
+          "default": {
+            "description": ""
           }
         }
       }
@@ -154,15 +105,12 @@
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "integer"
+            "type": "string"
           }
         ],
         "responses": {
-          "200": {
-            "description": "Daftar menu"
-          },
-          "404": {
-            "description": "Tidak ditemukan"
+          "default": {
+            "description": ""
           }
         }
       }

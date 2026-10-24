@@ -1,10 +1,12 @@
 import {
   StallRepository,
-  type CreateStallInput,
   type FindAllParams,
 } from '../repositories/stallRepository.ts';
 import { MenuItemRepository } from '../repositories/menuItemRepository.ts';
 import type { MenuItemDto, StallResponseDto } from '../dtos/stallDto.ts';
+import { AppError } from '../errors/AppError.ts';
+import { NotFoundError } from '../errors/NotFoundError.ts';
+import type { CreateStallInput, UpdateStallInput } from '../schemas/stallSchema.ts';
 
 type StallRow = NonNullable<Awaited<ReturnType<StallRepository['findById']>>>;
 
@@ -43,31 +45,32 @@ export class StallService {
 
   async getStallById(id: number): Promise<StallResponseDto> {
     const row = await this.stallRepository.findById(id);
-    if (!row) throw new Error('STALL_NOT_FOUND');
+    if (!row) throw new NotFoundError('Warung tidak ditemukan');
     return this.toDto(row);
   }
 
   async getStallMenus(id: number): Promise<MenuItemDto[]> {
     const row = await this.stallRepository.findById(id);
-    if (!row) throw new Error('STALL_NOT_FOUND');
+    if (!row) throw new NotFoundError('Warung tidak ditemukan');
     return this.menuItemRepository.findByStallId(id);
   }
 
-  async createStall(input: CreateStallInput): Promise<StallResponseDto> {
-    const row = await this.stallRepository.create(input);
-    if (!row) throw new Error('STALL_NOT_FOUND');
+  // ownerId dikirim terpisah, bukan dari body, supaya client tidak bisa menentukan sendiri.
+  async createStall(input: CreateStallInput, ownerId: number): Promise<StallResponseDto> {
+    const row = await this.stallRepository.create({ ...input, ownerId });
+    if (!row) throw new AppError(500, 'Warung gagal dibuat');
     return this.toDto(row);
   }
 
-  async updateStall(id: number, input: Partial<CreateStallInput>): Promise<StallResponseDto> {
+  async updateStall(id: number, input: UpdateStallInput): Promise<StallResponseDto> {
     const row = await this.stallRepository.update(id, input);
-    if (!row) throw new Error('STALL_NOT_FOUND');
+    if (!row) throw new NotFoundError('Warung tidak ditemukan');
     return this.toDto(row);
   }
 
   async deleteStall(id: number): Promise<StallResponseDto> {
     const row = await this.stallRepository.remove(id);
-    if (!row) throw new Error('STALL_NOT_FOUND');
+    if (!row) throw new NotFoundError('Warung tidak ditemukan');
     return this.toDto(row);
   }
 }
