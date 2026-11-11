@@ -63,7 +63,7 @@ Copy-Item .env.example .env
 DB_SERVER=localhost
 DB_PORT=1433
 DB_USER=praktikum_user
-DB_PASSWORD=Praktikum2026!
+DB_PASSWORD=isi_password_database_anda
 DB_NAME=review_kantin
 DB_ENCRYPT=false
 DB_TRUST_SERVER_CERTIFICATE=true
