@@ -10,10 +10,12 @@ import { authenticate } from './middlewares/auth.ts';
 import { authorize } from './middlewares/authorize.ts';
 import { notFoundHandler } from './middlewares/notFound.ts';
 import { errorHandler } from './middlewares/errorHandler.ts';
+import cors from 'cors';
 
 const app: Application = express();
 const PORT: number = 3000;
 
+app.use(cors({ origin: 'http://localhost:5173' }));
 app.use(express.json());
 
 // Dokumentasi API, dibuat otomatis dari schema zod.

@@ -3,6 +3,7 @@ import { AuthService } from '../services/authService.ts';
 import { getUser } from '../middlewares/auth.ts';
 import { getValidated } from '../middlewares/validate.ts';
 import type { LoginInput, RegisterInput } from '../schemas/authSchema.ts';
+import { logActivity } from '../services/auditService.ts';
 
 export class AuthController {
   private authService: AuthService;
@@ -14,6 +15,7 @@ export class AuthController {
   register = async (_req: Request, res: Response): Promise<void> => {
     const body = getValidated<RegisterInput>(res, 'body');
     const user = await this.authService.register(body);
+    await logActivity(user.id, 'REGISTER', 'USERS', user.id, user.email);
     res.status(201).json({ status: 'success', data: { user } });
   };
 

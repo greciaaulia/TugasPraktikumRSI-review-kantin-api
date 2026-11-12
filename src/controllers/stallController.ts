@@ -2,6 +2,7 @@ import { getUser } from '../middlewares/auth.ts';
 import type { Request, Response } from 'express';
 import { StallService } from '../services/stallService.ts';
 import { getValidated } from '../middlewares/validate.ts';
+import { logActivity } from '../services/auditService.ts';
 import type {
   CreateStallInput,
   IdParam,
@@ -48,6 +49,7 @@ export class StallController {
     const { id: ownerId } = getUser(req); // pemilik = user dari token, bukan dari body
 
     const stall = await this.stallService.createStall(body, ownerId);
+    await logActivity(ownerId, 'CREATE_STALL', 'STALLS', stall.id, stall.name);
     res.status(201).json({ status: 'success', data: stall });
   };
 
@@ -57,12 +59,15 @@ export class StallController {
     const user = getUser(req);
 
     const stall = await this.stallService.updateStall(id, body, user);
+    await logActivity(user.id, 'UPDATE_STALL', 'STALLS', stall.id, stall.name);
     res.status(200).json({ status: 'success', data: stall });
   };
 
-  deleteStall = async (_req: Request, res: Response): Promise<void> => {
+  deleteStall = async (req: Request, res: Response): Promise<void> => {
     const { id } = getValidated<IdParam>(res, 'params');
+    const user = getUser(req);
     const stall = await this.stallService.deleteStall(id);
+    await logActivity(user.id, 'DELETE_STALL', 'STALLS', stall.id, stall.name);
     res.status(200).json({ status: 'success', data: stall });
   };
 }
